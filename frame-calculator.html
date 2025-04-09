@@ -81,7 +81,11 @@
     <input type="number" id="ProfileDepth" step="0.01" value="1.25">
   </label>
 
-  <label>Face Width (inches):
+  <label>Rabbet Depth (inches):
+  <input type="number" id="rabbetDepth" step="0.01" value="0.375">
+</label>
+
+<label>Face Width (inches):
     <input type="number" id="faceWidth" step="0.01" value="0.75">
   </label>
 
@@ -94,6 +98,12 @@
   </label>
 
   <label>Include Matting or Spacer?
+</label>
+<label>Include Plexiglass?
+  <select id="plexi">
+    <option value="no">No</option>
+    <option value="yes">Yes</option>
+  </select>
     <select id="matting">
       <option value="no">No</option>
       <option value="yes">Yes</option>
@@ -133,6 +143,9 @@
       const faceWidth = parseFloat(document.getElementById("faceWidth").value) || 0.75;
       const wood = document.getElementById("woodType").value;
       const matting = document.getElementById("matting").value === "yes";
+  const plexiIncluded = document.getElementById("plexi").value === "yes";
+  const plexiThickness = plexiIncluded ? 0.125 : 0;
+
       const qty = parseInt(document.getElementById("quantity").value);
 
       if (!width || !height || qty < 1) {
@@ -140,7 +153,7 @@
         return;
       }
 
-      const rabbetDepth = 0.375; // Default rabbet depth
+      const rabbetDepth = parseFloat(document.getElementById("rabbetDepth").value) || 0.375;
       const matAllowance = matting ? 0.5 : 0.25;
       const totalBackDepth = artworkThickness + strainerThickness;
 
@@ -184,10 +197,11 @@
 
       
   const matDepth = matting ? 0.125 : 0;
-  const estimatedRabbetHeight = artworkThickness + strainerThickness + matDepth;
+  const estimatedRabbetHeight = artworkThickness + strainerThickness + matDepth + plexiThickness;
   const rabbetEstimate = document.getElementById("rabbetEstimate");
   rabbetEstimate.innerHTML =
     `Estimated rabbet height needed: <strong>${estimatedRabbetHeight.toFixed(3)}"</strong><br>` +
+    `(Artwork${strainerIncluded ? " + Strainer" : ""}${matting ? " + Matting" : ""}${plexiIncluded ? " + Plexiglass" : ""})<br>` +
     `(Artwork${strainerIncluded ? " + Strainer" : ""}${matting ? " + Matting" : ""})<br>` +
     `Standard rabbet depth: 0.375"`;
 
@@ -273,6 +287,9 @@ function exportCSV() {
   const faceWidth = parseFloat(document.getElementById("faceWidth").value) || 0.75;
   const wood = document.getElementById("woodType").value;
   const matting = document.getElementById("matting").value === "yes";
+  const plexiIncluded = document.getElementById("plexi").value === "yes";
+  const plexiThickness = plexiIncluded ? 0.125 : 0;
+
   const qty = parseInt(document.getElementById("quantity").value);
 
   if (!width || !height || qty < 1) {
@@ -316,4 +333,3 @@ function exportCSV() {
 
 </body>
 </html>
-
