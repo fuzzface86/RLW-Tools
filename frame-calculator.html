@@ -116,6 +116,7 @@
     <div id="cutList"></div>
     <div id="priceEstimate"></div>
     <div id="rabbetWarning" class="warning"></div>
+    <div id="rabbetEstimate" style="margin-top: 1em; font-style: italic;"></div>
     <canvas id="diagramTop" width="600" height="400"></canvas>
     <canvas id="diagramSide" width="600" height="200"></canvas>
   </div>
@@ -181,7 +182,16 @@
         warningBox.innerText = '';
       }
 
-      document.getElementById("output").style.display = "block";
+      
+  const matDepth = matting ? 0.125 : 0;
+  const estimatedRabbetHeight = artworkThickness + strainerThickness + matDepth;
+  const rabbetEstimate = document.getElementById("rabbetEstimate");
+  rabbetEstimate.innerHTML =
+    `Estimated rabbet height needed: <strong>${estimatedRabbetHeight.toFixed(3)}"</strong><br>` +
+    `(Artwork${strainerIncluded ? " + Strainer" : ""}${matting ? " + Matting" : ""})<br>` +
+    `Standard rabbet depth: 0.375"`;
+
+  document.getElementById("output").style.display = "block";
       drawTopDiagram(outsideWidth, outsideHeight, width, height, matting);
       drawSideDiagram(rabbetDepth, artworkThickness, strainerIncluded);
     }
