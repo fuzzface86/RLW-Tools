@@ -4,175 +4,49 @@
   <meta charset="UTF-8">
   <title>Woodworking Tools Hub</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="A hub for various woodworking tools and calculators.">
+  <meta name="keywords" content="woodworking, tools, calculators">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg-light: #f4f4f9;
-      --bg-dark: #121212;
-      --text-light: #222;
-      --text-dark: #ddd;
-      --card-light: white;
-      --card-dark: #1e1e1e;
-    }
-
-    body {
-      font-family: 'Inter', sans-serif;
-      margin: 0;
-      padding: 2rem;
-      background: var(--bg-light);
-      color: var(--text-light);
-      transition: background 0.3s, color 0.3s;
-    }
-
-    body.dark {
-      background: var(--bg-dark);
-      color: var(--text-dark);
-    }
-
-    .header {
-      text-align: center;
-      margin-bottom: 2rem;
-    }
-
-    .brand {
-      font-size: 2rem;
-      font-weight: bold;
-    }
-
-    .dark-toggle {
-      margin-top: 0.5rem;
-    }
-
-    .tool-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 2rem;
-      max-width: 1000px;
-      margin: 0 auto;
-    }
-
-    .tool-card {
-      background: var(--card-light);
-      border-radius: 16px;
-      padding: 1.5rem;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
-      text-align: center;
-      transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.3s;
-    }
-
-    body.dark .tool-card {
-      background: var(--card-dark);
-    }
-
-    .tool-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
-    }
-
-    .tool-card a {
-      text-decoration: none;
-      color: inherit;
-    }
-
-    .tool-icon {
-      font-size: 2.5rem;
-      margin-bottom: 1rem;
-    }
-
-    .tool-title {
-      font-size: 1.4rem;
-      font-weight: bold;
-    }
-
-    .tool-desc {
-      font-size: 0.95rem;
-      color: inherit;
-      margin-top: 0.5rem;
-      opacity: 0.8;
-    }
-
-    .footer {
-      margin-top: 3rem;
-      text-align: center;
-      font-size: 0.9rem;
-      opacity: 0.7;
-    }
-
-    .footer a {
-      color: inherit;
-      text-decoration: underline;
-    }
-
-    button.toggle-button {
-      padding: 0.3rem 0.7rem;
-      font-size: 0.9rem;
-      cursor: pointer;
-      border: 1px solid #ccc;
-      background: none;
-      border-radius: 4px;
-      transition: background 0.2s;
-    }
-
-    button.toggle-button:hover {
-      background: rgba(0,0,0,0.05);
-    }
-
-    body.dark button.toggle-button:hover {
-      background: rgba(255,255,255,0.05);
-    }
-  </style>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-
-  <div class="header">
+  <header class="header">
     <div class="brand">🪵 My Woodworking Tools</div>
     <div class="dark-toggle">
-      <button class="toggle-button" onclick="toggleDarkMode()">🌙 Toggle Dark Mode</button>
+      <button class="toggle-button">🌙 Toggle Dark Mode</button>
     </div>
-  </div>
+  </header>
 
-  <div class="tool-grid">
+  <main class="tool-grid">
     <div class="tool-card">
       <a href="frame-calculator.html">
-        <div class="tool-icon">🖼️</div>
+        <div class="tool-icon">🖼️ <span class="sr-only">Frame Cut List Calculator</span></div>
         <div class="tool-title">Frame Cut List Calculator</div>
         <div class="tool-desc">Calculate miters, rabbet depth, and pricing.</div>
       </a>
     </div>
     <div class="tool-card">
       <a href="inch-mm-converter.html">
-        <div class="tool-icon">📏</div>
+        <div class="tool-icon">📏 <span class="sr-only">Inch ⇄ Millimeter Converter</span></div>
         <div class="tool-title">Inch ⇄ Millimeter Converter</div>
         <div class="tool-desc">Quickly convert between inches and millimeters.</div>
       </a>
     </div>
     <div class="tool-card">
       <a href="cutting-board-designer.html">
-        <div class="tool-icon">🔪</div>
+        <div class="tool-icon">🔪 <span class="sr-only">Cutting Board Designer</span></div>
         <div class="tool-title">Cutting Board Designer</div>
         <div class="tool-desc">Plan wood layers and calculate material usage.</div>
       </a>
     </div>
-  </div>
+  </main>
 
-  <div class="footer">
-    Made with ❤️ by [Your Name] &mdash; 
+  <footer class="footer">
+    Made with ❤️ by Ian &mdash;
     <a href="https://github.com/yourusername" target="_blank">GitHub</a> | 
     <a href="mailto:you@example.com">Contact</a>
-  </div>
+  </footer>
 
-  <script>
-    function toggleDarkMode() {
-      document.body.classList.toggle('dark');
-      localStorage.setItem('darkMode', document.body.classList.contains('dark'));
-    }
-
-    window.onload = () => {
-      if (localStorage.getItem('darkMode') === 'true') {
-        document.body.classList.add('dark');
-      }
-    };
-  </script>
-
+  <script src="scripts.js" defer></script>
 </body>
 </html>
