@@ -113,7 +113,7 @@
       const strainerIncluded = document.getElementById("strainer").value === "yes";
       const strainerThickness = strainerIncluded ? 0.5 : 0;
       const profile = document.getElementById("profileType").value;
-      const ProfileDepth = parseFloat(document.getElementById("profileWidth").value) || 1.25;
+      const ProfileDepth = parseFloat(document.getElementById("ProfileDepth").value) || 1.25;
       const faceWidth = parseFloat(document.getElementById("faceWidth").value) || 0.75;
       const wood = document.getElementById("woodType").value;
       const matting = document.getElementById("matting").value === "yes";
@@ -134,8 +134,8 @@
       const sideA = totalWidth + (2 * rabbetDepth);
       const sideB = totalHeight + (2 * rabbetDepth);
 
-      const outsideWidth = totalWidth + (2 * profileWidth);
-      const outsideHeight = totalHeight + (2 * profileWidth);
+      const outsideWidth = totalWidth + (2 * ProfileDepth);
+      const outsideHeight = totalHeight + (2 * ProfileDepth);
 
       const baseRates = { maple: 1.2, cherry: 1.0, walnut: 1.6 };
       const perimeter = 2 * (sideA + sideB);
@@ -213,19 +213,17 @@
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       const baseY = 160;
-      const scale = 100; // 1" = 100px
+      const scale = 100;
       const rabbet = rabbetDepth * scale;
       const artHeight = artwork * scale;
       const strainerHeight = hasStrainer ? 0.5 * scale : 0;
 
-      // Rabbet box
       ctx.strokeStyle = "#333";
       ctx.lineWidth = 2;
       ctx.strokeRect(100, baseY - rabbet, 40, rabbet);
       ctx.fillStyle = "#000";
       ctx.fillText("Rabbet", 100, baseY - rabbet - 8);
 
-      // Strainer (if present)
       if (hasStrainer) {
         ctx.fillStyle = "#888";
         ctx.fillRect(140, baseY - strainerHeight, 40, strainerHeight);
@@ -233,7 +231,6 @@
         ctx.fillText("Strainer", 190, baseY - strainerHeight / 2);
       }
 
-      // Artwork block
       ctx.fillStyle = "#aaa";
       ctx.fillRect(140, baseY - strainerHeight - artHeight, 40, artHeight);
       ctx.fillStyle = "#000";
