@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Woodworking Tools</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      padding: 2rem;
+      background: #f8f8f8;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h1 {
+      margin-bottom: 2rem;
+    }
+
+    .tool-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .tool {
+      background: white;
+      padding: 1.2rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      text-align: center;
+      transition: 0.2s ease;
+    }
+
+    .tool:hover {
+      transform: scale(1.02);
+      background: #f0f0f0;
+    }
+
+    .tool a {
+      text-decoration: none;
+      color: #333;
+      font-weight: bold;
+      font-size: 1.2rem;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Woodworking Tools</h1>
+
+  <div class="tool-list">
+    <div class="tool">
+      <a href="frame-calculator.html">🖼️ Frame Cut List Calculator</a>
+    </div>
+    <div class="tool">
+      <a href="inch-mm-converter.html">📏 Inch ⇄ Millimeter Converter</a>
+    </div>
+    <div class="tool">
+      <a href="cutting-board-designer.html">🔪 Cutting Board Designer</a>
+    </div>
+  </div>
+
+</body>
+</html>
