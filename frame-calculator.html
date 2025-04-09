@@ -31,7 +31,21 @@
       font-weight: bold;
       margin-top: 1em;
     }
-  </style>
+  
+@media (max-width: 600px) {
+  body {
+    padding: 1rem;
+  }
+  input, select, textarea, button {
+    font-size: 1em;
+  }
+  canvas {
+    width: 100% !important;
+    height: auto !important;
+  }
+}
+
+</style>
 </head>
 <body>
 
@@ -95,6 +109,7 @@
   </label>
 
   <button onclick="calculate()">Calculate Cut List</button>
+  <button onclick="exportCSV()">Export Cut List as CSV</button>
 
   <div class="result" id="output" style="display:none;">
     <h3>Cut List & Estimate</h3>
@@ -236,7 +251,58 @@
       ctx.fillStyle = "#000";
       ctx.fillText("Artwork", 190, baseY - strainerHeight - artHeight / 2);
     }
-  </script>
+  
+function exportCSV() {
+  const width = parseFloat(document.getElementById("artWidth").value);
+  const height = parseFloat(document.getElementById("artHeight").value);
+  const artworkThickness = parseFloat(document.getElementById("artworkThickness").value) || 0.75;
+  const strainerIncluded = document.getElementById("strainer").value === "yes";
+  const strainerThickness = strainerIncluded ? 0.5 : 0;
+  const profile = document.getElementById("profileType").value;
+  const ProfileDepth = parseFloat(document.getElementById("ProfileDepth").value) || 1.25;
+  const faceWidth = parseFloat(document.getElementById("faceWidth").value) || 0.75;
+  const wood = document.getElementById("woodType").value;
+  const matting = document.getElementById("matting").value === "yes";
+  const qty = parseInt(document.getElementById("quantity").value);
+
+  if (!width || !height || qty < 1) {
+    alert("Please enter valid artwork dimensions and quantity.");
+    return;
+  }
+
+  const rabbetDepth = 0.375;
+  const matAllowance = matting ? 0.5 : 0.25;
+  const totalBackDepth = artworkThickness + strainerThickness;
+
+  const totalWidth = width + matAllowance;
+  const totalHeight = height + matAllowance;
+
+  const sideA = totalWidth + (2 * rabbetDepth);
+  const sideB = totalHeight + (2 * rabbetDepth);
+
+  const outsideWidth = totalWidth + (2 * ProfileDepth);
+  const outsideHeight = totalHeight + (2 * ProfileDepth);
+
+  const csv = `Cut List for ${qty} Frame(s)\n` +
+              `Side A (x2):,${sideA.toFixed(2)} in\n` +
+              `Side B (x2):,${sideB.toFixed(2)} in\n` +
+              `Outside Width:,${outsideWidth.toFixed(2)} in\n` +
+              `Outside Height:,${outsideHeight.toFixed(2)} in\n` +
+              `Wood Type:,${wood}\n` +
+              `Profile:,${profile}\n` +
+              `Matting:,${matting ? "Yes" : "No"}\n`;
+
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "frame_cut_list.csv";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+</script>
 
 </body>
 </html>
