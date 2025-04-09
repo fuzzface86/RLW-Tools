@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Frame Cut List + Rabbet Check</title>
+  <style>
+    body { font-family: sans-serif; max-width: 900px; margin: auto; padding: 2rem; }
+    label { display: block; margin-top: 1em; font-weight: bold; }
+    input, select, textarea, button {
+      width: 100%;
+      padding: 0.5em;
+      margin-top: 0.25em;
+      font-size: 1em;
+    }
+    .result {
+      margin-top: 2em;
+      padding: 1em;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background: #f9f9f9;
+    }
+    canvas {
+      margin-top: 1em;
+      border: 1px solid #ccc;
+      width: 100%;
+      max-width: 600px;
+      height: auto;
+    }
+    .warning {
+      color: darkred;
+      font-weight: bold;
+      margin-top: 1em;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Frame Cut List & Rabbet Fit Checker</h1>
+
+  <label>Artwork Width (inches):
+    <input type="number" id="artWidth" step="0.01">
+  </label>
+
+  <label>Artwork Height (inches):
+    <input type="number" id="artHeight" step="0.01">
+  </label>
+
+  <label>Artwork Thickness (inches):
+    <input type="number" id="artworkThickness" step="0.01" value="0.75">
+  </label>
+
+  <label>Include 1/2" Strainer?
+    <select id="strainer">
+      <option value="no">No</option>
+      <option value="yes">Yes</option>
+    </select>
+  </label>
+
+  <label>Profile Type:
+    <select id="profileType">
+      <option value="straight">Straight</option>
+      <option value="curved">Curved</option>
+    </select>
+  </label>
+
+  <label>Profile Depth (inches):
+    <input type="number" id="ProfileDepth" step="0.01" value="1.25">
+  </label>
+
+  <label>Face Width (inches):
+    <input type="number" id="faceWidth" step="0.01" value="0.75">
+  </label>
+
+  <label>Wood Type:
+    <select id="woodType">
+      <option value="maple">Maple (mid)</option>
+      <option value="cherry">Cherry (cheaper)</option>
+      <option value="walnut">Walnut (premium)</option>
+    </select>
+  </label>
+
+  <label>Include Matting or Spacer?
+    <select id="matting">
+      <option value="no">No</option>
+      <option value="yes">Yes</option>
+    </select>
+  </label>
+
+  <label>Quantity:
+    <input type="number" id="quantity" value="1" min="1">
+  </label>
+
+  <label>Client / Project Notes:
+    <textarea id="notes" rows="4" placeholder="Optional notes or special instructions..."></textarea>
+  </label>
+
+  <button onclick="calculate()">Calculate Cut List</button>
+
+  <div class="result" id="output" style="display:none;">
+    <h3>Cut List & Estimate</h3>
+    <div id="cutList"></div>
+    <div id="priceEstimate"></div>
+    <div id="rabbetWarning" class="warning"></div>
+    <canvas id="diagramTop" width="600" height="400"></canvas>
+    <canvas id="diagramSide" width="600" height="200"></canvas>
+  </div>
+
+  <script>
+    function calculate() {
+      const width = parseFloat(document.getElementById("artWidth").value);
+      const height = parseFloat(document.getElementById("artHeight").value);
+      const artworkThickness = parseFloat(document.getElementById("artworkThickness").value) || 0.75;
+      const strainerIncluded = document.getElementById("strainer").value === "yes";
+      const strainerThickness = strainerIncluded ? 0.5 : 0;
+      const profile = document.getElementById("profileType").value;
+      const ProfileDepth = parseFloat(document.getElementById("profileWidth").value) || 1.25;
+      const faceWidth = parseFloat(document.getElementById("faceWidth").value) || 0.75;
+      const wood = document.getElementById("woodType").value;
+      const matting = document.getElementById("matting").value === "yes";
+      const qty = parseInt(document.getElementById("quantity").value);
+
+      if (!width || !height || qty < 1) {
+        alert("Please enter valid artwork dimensions and quantity.");
+        return;
+      }
+
+      const rabbetDepth = 0.375; // Default rabbet depth
+      const matAllowance = matting ? 0.5 : 0.25;
+      const totalBackDepth = artworkThickness + strainerThickness;
+
+      const totalWidth = width + matAllowance;
+      const totalHeight = height + matAllowance;
+
+      const sideA = totalWidth + (2 * rabbetDepth);
+      const sideB = totalHeight + (2 * rabbetDepth);
+
+      const outsideWidth = totalWidth + (2 * profileWidth);
+      const outsideHeight = totalHeight + (2 * profileWidth);
+
+      const baseRates = { maple: 1.2, cherry: 1.0, walnut: 1.6 };
+      const perimeter = 2 * (sideA + sideB);
+      const unitCost = baseRates[wood] * perimeter;
+      const profileMultiplier = profile === "curved" ? 1.2 : 1.0;
+      const finalCost = (unitCost * profileMultiplier * qty).toFixed(2);
+
+      document.getElementById("cutList").innerHTML = `
+        <strong>Frame Side Cuts (per frame):</strong><br>
+        - ${sideA.toFixed(2)}" x 2<br>
+        - ${sideB.toFixed(2)}" x 2<br>
+        <br><em>Mitered 45° corners. Add 2” total for join clearance.</em><br><br>
+        <strong>Outside Frame Dimensions:</strong><br>
+        - Width: ${outsideWidth.toFixed(2)}"<br>
+        - Height: ${outsideHeight.toFixed(2)}"
+      `;
+
+      document.getElementById("priceEstimate").innerHTML = `
+        <strong>Estimate:</strong> $${finalCost} for ${qty} frame(s)<br>
+        - Wood: ${wood.charAt(0).toUpperCase() + wood.slice(1)}<br>
+        - Profile: ${profile}, Matting: ${matting ? "Yes" : "No"}
+      `;
+
+      const warningBox = document.getElementById("rabbetWarning");
+      if (totalBackDepth > rabbetDepth) {
+        warningBox.innerText = `⚠️ Warning: Total build depth (${totalBackDepth.toFixed(2)}") exceeds rabbet depth (${rabbetDepth}"). You may need a deeper profile or build out.`;
+      } else {
+        warningBox.innerText = '';
+      }
+
+      document.getElementById("output").style.display = "block";
+      drawTopDiagram(outsideWidth, outsideHeight, width, height, matting);
+      drawSideDiagram(rabbetDepth, artworkThickness, strainerIncluded);
+    }
+
+    function drawTopDiagram(outW, outH, artW, artH, matting) {
+      const canvas = document.getElementById("diagramTop");
+      const ctx = canvas.getContext("2d");
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const margin = 40;
+      const scale = Math.min((canvas.width - margin*2) / outW, (canvas.height - margin*2) / outH);
+      const offsetX = (canvas.width - outW * scale) / 2;
+      const offsetY = (canvas.height - outH * scale) / 2;
+
+      // Outer frame
+      ctx.strokeStyle = "#333";
+      ctx.lineWidth = 2;
+      ctx.strokeRect(offsetX, offsetY, outW * scale, outH * scale);
+
+      // Artwork area
+      const matAllowance = matting ? 0.5 : 0.25;
+      const artBoxW = (artW + matAllowance) * scale;
+      const artBoxH = (artH + matAllowance) * scale;
+      const innerX = offsetX + (outW * scale - artBoxW) / 2;
+      const innerY = offsetY + (outH * scale - artBoxH) / 2;
+
+      ctx.strokeStyle = "#aaa";
+      ctx.lineWidth = 1;
+      ctx.strokeRect(innerX, innerY, artBoxW, artBoxH);
+
+      // Labels and arrows
+      ctx.fillStyle = "#000";
+      ctx.fillText(`Side A: ${outW.toFixed(2)}"`, offsetX + (outW * scale) / 2 - 40, offsetY - 10);
+      ctx.save();
+      ctx.translate(offsetX - 30, offsetY + (outH * scale) / 2);
+      ctx.rotate(-Math.PI / 2);
+      ctx.fillText(`Side B: ${outH.toFixed(2)}"`, -30, 0);
+      ctx.restore();
+    }
+
+    function drawSideDiagram(rabbetDepth, artwork, hasStrainer) {
+      const canvas = document.getElementById("diagramSide");
+      const ctx = canvas.getContext("2d");
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const baseY = 160;
+      const scale = 100; // 1" = 100px
+      const rabbet = rabbetDepth * scale;
+      const artHeight = artwork * scale;
+      const strainerHeight = hasStrainer ? 0.5 * scale : 0;
+
+      // Rabbet box
+      ctx.strokeStyle = "#333";
+      ctx.lineWidth = 2;
+      ctx.strokeRect(100, baseY - rabbet, 40, rabbet);
+      ctx.fillStyle = "#000";
+      ctx.fillText("Rabbet", 100, baseY - rabbet - 8);
+
+      // Strainer (if present)
+      if (hasStrainer) {
+        ctx.fillStyle = "#888";
+        ctx.fillRect(140, baseY - strainerHeight, 40, strainerHeight);
+        ctx.fillStyle = "#000";
+        ctx.fillText("Strainer", 190, baseY - strainerHeight / 2);
+      }
+
+      // Artwork block
+      ctx.fillStyle = "#aaa";
+      ctx.fillRect(140, baseY - strainerHeight - artHeight, 40, artHeight);
+      ctx.fillStyle = "#000";
+      ctx.fillText("Artwork", 190, baseY - strainerHeight - artHeight / 2);
+    }
+  </script>
+
+</body>
+</html>
