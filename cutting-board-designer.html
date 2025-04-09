@@ -19,23 +19,6 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth
 Floor, Boston, MA 02110-1301, USA.
 -->
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<style>
-  @media (max-width: 768px) {
-    .layout-wrapper {
-      flex-direction: column !important;
-    }
-    .layout-wrapper > div {
-      width: 100% !important;
-      float: none !important;
-    }
-    svg {
-      width: 100% !important;
-      height: auto !important;
-    }
-  }
-</style>
-
 </head>
 <body>
 <style>
@@ -48,7 +31,7 @@ Floor, Boston, MA 02110-1301, USA.
     border-right: 1px solid;
   }
 </style>
-<div class="layout-wrapper" style="display: flex; flex-flow: row wrap;">
+<div style="display: flex; flex-flow: row wrap;">
   <div style="display: inline; float: left">
     <div style="display: block; float: left; padding: 4px">
       <div style="display: inline-block; float:left;">
@@ -108,8 +91,7 @@ Floor, Boston, MA 02110-1301, USA.
           <span id="OUTPUT_LEFT_OVER">0</span></div>
         <div style="display: block;">
           Wood used:
-          <ul id="OUTPUT_WOOD_USED"></ul>
-<button onclick="exportCSV()">Export as CSV</button></div>
+          <ul id="OUTPUT_WOOD_USED"></ul></div>
         <div style="display: block;">
           <button type=button onclick="getURL()" style="display:block;">
               Get this design as an URL for bookmarking.</button>
@@ -147,18 +129,31 @@ Floor, Boston, MA 02110-1301, USA.
     </div>
   </div>
 </div>
-<div style="display: block; float: left; padding: 4px">
-  <label for="exampleSelect">Example designs:</label>
-  <select id="exampleSelect" onchange="loadExampleDesign(this.value)">
-    <option value="">-- Select a design --</option>
-    <option value="?v=2.1.0.3&SBL=13&SBT=1.2&OBT=1.5&BK=.125&FEO=0&REO=1&SO=0&w=6f0011,Cherry|292117,Ebony|b56816,Jatoba|fde96d,Maple|af0b7b,Purpleheart|4b351a,Walnut&l=5,1,0|3,1,0|5,1,0|3,1,0|5,1,0|3,1,0|5,1,0|3,1,0">Simple checkerboard</option>
-    <option value="?v=2.1.0.3&SBL=20&SBT=1.2&OBT=1.5&BK=.125&FEO=0&REO=1&SO=0&w=6f0011,Cherry|292117,Ebony|b56816,Jatoba|fde96d,Maple|af0b7b,Purpleheart|4b351a,Walnut&l=5,1,0|3,0.25,0|5,0.25,0|3,0.25,0|5,1,0|1,0.5,0|3,1,0|5,0.25,0|3,0.25,0|5,0.25,0|3,1,0">Complex checkerboard</option>
-    <option value="?v=2.1.0.3&SBL=20&SBT=1.2&OBT=1.5&BK=.125&FEO=1&REO=0&SO=0&w=6f0011,Cherry|292117,Ebony|b56816,Jatoba|fde96d,Maple|af0b7b,Purpleheart|4b351a,Walnut&l=5,1,0|3,1.25,45|0,2,45|3,2,0|5,1,0">Zig-zag</option>
-    <option value="?v=2.1.0.3&SBL=20&SBT=1.2&OBT=1.5&BK=.125&FEO=0&REO=1&SO=0&w=6f0011,Cherry|292117,Ebony|b56816,Jatoba|fde96d,Maple|af0b7b,Purpleheart|4b351a,Walnut&l=3,1.25,45|4,2,45|1,3,-45|3,1.25,0">Spiral</option>
-    <option value="?v=2.1.0.3&SBL=20&SBT=1.2&OBT=1.5&BK=.125&FEO=1&REO=0&SO=0&w=6f0011,Cherry|292117,Ebony|b56816,Jatoba|fde96d,Maple|af0b7b,Purpleheart|4b351a,Walnut&l=3,1.25,45|2,2,45|1,3,-45|2,2,-45|3,1.25,0">Snake skin</option>
-  </select>
+<div style="display: flex; flex-direction: column">
+  Example designs:
+  <ul>
+    <li>
+      <a href="?v=2.1.0.3&SBL=13&SBT=1.2&OBT=1.5&BK=.125&FEO=0&REO=1&SO=0&w=6f0011,Cherry|292117,Ebony|b56816,Jatoba|fde96d,Maple|af0b7b,Purpleheart|4b351a,Walnut&l=5,1,0|3,1,0|5,1,0|3,1,0|5,1,0|3,1,0|5,1,0|3,1,0">Simple checkerboard</a>
+    </li>
+    <li>
+      <a href="?v=2.1.0.3&SBL=20&SBT=1.2&OBT=1.5&BK=.125&FEO=0&REO=1&SO=0&w=6f0011,Cherry|292117,Ebony|b56816,Jatoba|fde96d,Maple|af0b7b,Purpleheart|4b351a,Walnut&l=5,1,0|3,0.25,0|5,0.25,0|3,0.25,0|5,1,0|1,0.5,0|3,1,0|5,0.25,0|3,0.25,0|5,0.25,0|3,1,0">Complex checkerboard</a>
+    </li>
+    <li>
+      <a href="?v=2.1.0.3&SBL=20&SBT=1.2&OBT=1.5&BK=.125&FEO=1&REO=0&SO=0&w=6f0011,Cherry|292117,Ebony|b56816,Jatoba|fde96d,Maple|af0b7b,Purpleheart|4b351a,Walnut&l=5,1,0|3,1.25,45|0,2,45|3,2,0|5,1,0">Zig-zag</a>
+    </li>
+    <li>
+      <a href="?v=2.1.0.3&SBL=20&SBT=1.2&OBT=1.5&BK=.125&FEO=0&REO=1&SO=0&w=6f0011,Cherry|292117,Ebony|b56816,Jatoba|fde96d,Maple|af0b7b,Purpleheart|4b351a,Walnut&l=3,1.25,45|4,2,45|1,3,-45|3,1.25,0">Spiral</a>
+    </li>
+    <li>
+      <a href="?v=2.1.0.3&SBL=20&SBT=1.2&OBT=1.5&BK=.125&FEO=1&REO=0&SO=0&w=6f0011,Cherry|292117,Ebony|b56816,Jatoba|fde96d,Maple|af0b7b,Purpleheart|4b351a,Walnut&l=3,1.25,45|2,2,45|1,3,-45|2,2,-45|3,1.25,0">Snake skin</a>
+    </li>
+  </ul>
 </div>
-
+<div style="display: block; float: left; padding: 4px">
+  This is Cutting Board Designer JS version <span id="VERSION_DISPLAY"></span>.
+  Here's a link to the <a href="https://ericu.github.io/CBDJS/cb.html">latest
+  version</a> and <a href="https://github.com/ericu/CBDJS/">git repo</a>.
+</div>
 <!--
 <button type=button style="display: inline-block; float: bottom"
     onclick="recalculate()">Recalculate</button>
@@ -889,41 +884,26 @@ function init() {
   setStateFromData(DEFAULT_WOODS, SAMPLE_LAYERS);
 }
 
-  function loadExampleDesign(url) {
-  if (!url) return;
-  window.location.search = url;
-}
-
 init();
-
-
-function exportCSV() {
-  const usedData = document.querySelectorAll("#OUTPUT_WOOD_USED li");
-  let csv = "Wood Name,Used (in),Wasted (in)\n";
-
-  usedData.forEach(li => {
-    const match = li.textContent.match(/(.+?): ([\d.]+).*?([\d.]+) lost/);
-    if (match) {
-      const [_, name, used, wasted] = match;
-      csv += `${name},${used},${wasted}\n`;
-    }
-  });
-
-  const blob = new Blob([csv], { type: 'text/csv' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'wood_usage.csv';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-}
-
 
 </script>
 <!-- Start of StatCounter Code; if you clone this project, you might want to
 remove this.  If you run from a local copy at a file: URL, it's turned off. -->
-
+<script type="text/javascript">
+if (window.location.protocol != "file:") {
+  var sc_project=9325090;
+  var sc_invisible=1;
+  var sc_security="d9c7877d";
+  var scJsHost = (("https:" == document.location.protocol) ?
+  "https://secure." : "http://www.");
+  document.write("<sc"+"ript type='text/javascript' src='" + scJsHost+
+  "statcounter.com/counter/counter.js'></"+"script>");
+}
+</script>
+<noscript><div class="statcounter"><a title="website statistics"
+href="http://statcounter.com/free-web-stats/" target="_blank"><img
+class="statcounter" src="http://c.statcounter.com/9325090/0/d9c7877d/1/"
+alt="website statistics"></a></div></noscript>
 <!-- End of StatCounter Code -->
 </body>
 </html>
