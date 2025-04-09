@@ -17,6 +17,20 @@
       border-bottom: 1px solid #ccc;
       padding-bottom: 0.25em;
     }
+    .result {
+      margin-top: 2em;
+      padding: 1em;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background: #f9f9f9;
+    }
+    canvas {
+      margin-top: 1em;
+      border: 1px solid #ccc;
+      width: 100%;
+      max-width: 600px;
+      height: auto;
+    }
   </style>
 </head>
 <body>
@@ -106,7 +120,18 @@
     <textarea id="notes" rows="4" placeholder="Optional notes or special instructions..."></textarea>
   </label>
 
-  <button onclick="alert('Submission logic goes here')">Submit Order</button>
+  <button onclick="calculate()">Submit Order</button>
+  <button onclick="exportCSV()">Export as CSV</button>
 
+  <div class="result" id="output" style="display:none;">
+    <h3>Cut List & Estimate</h3>
+    <div id="cutList"></div>
+    <div id="priceEstimate"></div>
+    <div id="rabbetWarning" style="color: darkred; font-weight: bold;"></div>
+    <canvas id="diagramTop" width="600" height="400"></canvas>
+    <canvas id="diagramSide" width="600" height="200"></canvas>
+  </div>
+
+  <script src="frame-logic.js"></script>
 </body>
 </html>
