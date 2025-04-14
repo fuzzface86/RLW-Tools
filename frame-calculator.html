@@ -164,29 +164,57 @@
     }
 
     function drawTopDiagram(outW, outH, artW, artH, matting) {
-      const canvas = document.getElementById("diagramTop");
-      const ctx = canvas.getContext("2d");
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const canvas = document.getElementById("diagramTop");
+  const ctx = canvas.getContext("2d");
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      const margin = 40;
-      const scale = Math.min((canvas.width - margin * 2) / outW, (canvas.height - margin * 2) / outH);
-      const offsetX = (canvas.width - outW * scale) / 2;
-      const offsetY = (canvas.height - outH * scale) / 2;
+  const margin = 40;
+  const scale = Math.min((canvas.width - margin * 2) / outW, (canvas.height - margin * 2) / outH);
+  const offsetX = (canvas.width - outW * scale) / 2;
+  const offsetY = (canvas.height - outH * scale) / 2;
 
-      ctx.strokeStyle = "#333";
-      ctx.lineWidth = 2;
-      ctx.strokeRect(offsetX, offsetY, outW * scale, outH * scale);
+  // Outer frame (outside dimensions)
+  ctx.strokeStyle = "#333";
+  ctx.lineWidth = 2;
+  ctx.strokeRect(offsetX, offsetY, outW * scale, outH * scale);
 
-      const matAllowance = matting ? 0.5 : 0.25;
-      const artBoxW = (artW + matAllowance) * scale;
-      const artBoxH = (artH + matAllowance) * scale;
-      const innerX = offsetX + (outW * scale - artBoxW) / 2;
-      const innerY = offsetY + (outH * scale - artBoxH) / 2;
+  // Artwork (inside fit area)
+  const matAllowance = matting ? 0.5 : 0.25;
+  const insideW = artW + matAllowance;
+  const insideH = artH + matAllowance;
+  const artBoxW = insideW * scale;
+  const artBoxH = insideH * scale;
+  const innerX = offsetX + (outW * scale - artBoxW) / 2;
+  const innerY = offsetY + (outH * scale - artBoxH) / 2;
 
-      ctx.strokeStyle = "#aaa";
-      ctx.lineWidth = 1;
-      ctx.strokeRect(innerX, innerY, artBoxW, artBoxH);
-    }
+  ctx.strokeStyle = "#aaa";
+  ctx.lineWidth = 1;
+  ctx.strokeRect(innerX, innerY, artBoxW, artBoxH);
+
+  // Outside dimension labels
+  ctx.fillStyle = "#000";
+  ctx.font = "14px sans-serif";
+  ctx.textAlign = "center";
+  ctx.fillText(`Outside Width: ${outW.toFixed(2)}"`, offsetX + (outW * scale) / 2, offsetY - 10);
+
+  ctx.save();
+  ctx.translate(offsetX - 10, offsetY + (outH * scale) / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.fillText(`Outside Height: ${outH.toFixed(2)}"`, 0, 0);
+  ctx.restore();
+
+  // Inside dimension labels
+  ctx.fillStyle = "#444";
+  ctx.textAlign = "left";
+  ctx.fillText(`Inside Width: ${insideW.toFixed(2)}"`, innerX, innerY - 8);
+
+  ctx.save();
+  ctx.translate(innerX - 8, innerY + (artBoxH / 2));
+  ctx.rotate(-Math.PI / 2);
+  ctx.fillText(`Inside Height: ${insideH.toFixed(2)}"`, 0, 0);
+  ctx.restore();
+}
+
 
     function drawSideDiagram(rabbetDepth, artwork, hasStrainer) {
       const canvas = document.getElementById("diagramSide");
