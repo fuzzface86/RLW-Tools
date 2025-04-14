@@ -150,7 +150,7 @@
 
       document.getElementById("output").style.display = "block";
       drawTopDiagram(outsideWidth, outsideHeight, width, height, hasMat);
-      drawSideDiagram(rabbet, artwork, hasStrainer);
+      drawSideDiagram(rabbet, artwork, hasStrainer, hasMat, hasSpacer, hasPlexi);
     }
 
     function drawTopDiagram(outW, outH, artW, artH, matting) {
@@ -205,58 +205,65 @@
   ctx.restore();
 }
 
-  function drawSideDiagram(rabbetDepth, artwork, hasStrainer) {
+  function drawSideDiagram(rabbetDepth, artwork, hasStrainer, hasMat, hasSpacer, hasPlexi) {
   const canvas = document.getElementById("diagramSide");
   const ctx = canvas.getContext("2d");
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   const baseY = 160;
   const scale = 100;
-  const rabbet = rabbetDepth * scale;
-  const artHeight = artwork * scale;
-  const strainerHeight = hasStrainer ? 0.5 * scale : 0;
+
+  // Layer thicknesses
+  const layers = [];
+  layers.push({ name: "Artwork", height: artwork, color: "#aaa" });
+  if (hasStrainer) layers.unshift({ name: "Strainer", height: 0.5, color: "#888" });
+  if (hasMat) layers.unshift({ name: "Matting", height: 0.25, color: "#bbb" });
+  if (hasSpacer) layers.unshift({ name: "Spacer", height: 0.125, color: "#ccc" });
+  if (hasPlexi) layers.unshift({ name: "Plexiglass", height: 0.125, color: "#e0e0e0" });
+  layers.push({ name: "Hardware Gap", height: 0.25, color: null }); // Just a label, no visual block
+
   const profileDepth = rabbetDepth + 0.25;
   const profileHeight = profileDepth * scale;
 
   // Draw rabbet box
+  const rabbetHeight = rabbetDepth * scale;
   ctx.strokeStyle = "#333";
   ctx.lineWidth = 2;
-  ctx.strokeRect(100, baseY - rabbet, 40, rabbet);
+  ctx.strokeRect(100, baseY - rabbetHeight, 40, rabbetHeight);
   ctx.fillStyle = "#000";
-  ctx.fillText("Rabbet", 100, baseY - rabbet - 8);
+  ctx.fillText("Rabbet", 100, baseY - rabbetHeight - 8);
 
-  // Draw artwork
-  ctx.fillStyle = "#aaa";
-  ctx.fillRect(150, baseY - strainerHeight - artHeight, 40, artHeight);
-  ctx.fillStyle = "#000";
-  ctx.fillText("Artwork", 195, baseY - strainerHeight - artHeight / 2);
-
-  // Draw strainer if present
-  if (hasStrainer) {
-    ctx.fillStyle = "#888";
-    ctx.fillRect(150, baseY - strainerHeight, 40, strainerHeight);
+  // Draw stacked layers inside the rabbet
+  let currentY = baseY;
+  layers.forEach(layer => {
+    const h = layer.height * scale;
+    currentY -= h;
+    if (layer.color) {
+      ctx.fillStyle = layer.color;
+      ctx.fillRect(150, currentY, 40, h);
+    }
     ctx.fillStyle = "#000";
-    ctx.fillText("Strainer", 195, baseY - strainerHeight / 2);
-  }
+    ctx.fillText(layer.name, 195, currentY + h / 2);
+  });
 
-  // ---- Inside Height Dimension (Rabbet Fit) ----
+  // Inside Height Dimension
   ctx.strokeStyle = "#444";
   ctx.lineWidth = 1;
   ctx.beginPath();
   ctx.moveTo(85, baseY);
-  ctx.lineTo(85, baseY - rabbet);
+  ctx.lineTo(85, baseY - rabbetHeight);
   ctx.stroke();
   ctx.beginPath();
   ctx.moveTo(80, baseY);
   ctx.lineTo(90, baseY);
-  ctx.moveTo(80, baseY - rabbet);
-  ctx.lineTo(90, baseY - rabbet);
+  ctx.moveTo(80, baseY - rabbetHeight);
+  ctx.lineTo(90, baseY - rabbetHeight);
   ctx.stroke();
   ctx.fillStyle = "#444";
   ctx.font = "12px sans-serif";
-  ctx.fillText(`${rabbetDepth.toFixed(3)}" inside`, 10, baseY - rabbet / 2);
+  ctx.fillText(`${rabbetDepth.toFixed(3)}" inside`, 10, baseY - rabbetHeight / 2);
 
-  // ---- Outside Height Dimension (Profile Height) ----
+  // Outside Height Dimension (Profile)
   ctx.strokeStyle = "#000";
   ctx.lineWidth = 1.5;
   ctx.beginPath();
@@ -272,6 +279,7 @@
   ctx.fillStyle = "#000";
   ctx.fillText(`${profileDepth.toFixed(3)}" profile`, 260, baseY - profileHeight / 2);
 }
+
   </script>
 
 </body>
