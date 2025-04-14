@@ -215,36 +215,73 @@
   ctx.restore();
 }
 
+  function drawSideDiagram(rabbetDepth, artwork, hasStrainer) {
+  const canvas = document.getElementById("diagramSide");
+  const ctx = canvas.getContext("2d");
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    function drawSideDiagram(rabbetDepth, artwork, hasStrainer) {
-      const canvas = document.getElementById("diagramSide");
-      const ctx = canvas.getContext("2d");
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const baseY = 160;
+  const scale = 100;
+  const rabbet = rabbetDepth * scale;
+  const artHeight = artwork * scale;
+  const strainerHeight = hasStrainer ? 0.5 * scale : 0;
+  const profileDepth = rabbetDepth + 0.25;
+  const profileHeight = profileDepth * scale;
 
-      const baseY = 160;
-      const scale = 100;
-      const rabbet = rabbetDepth * scale;
-      const artHeight = artwork * scale;
-      const strainerHeight = hasStrainer ? 0.5 * scale : 0;
+  // Draw rabbet box
+  ctx.strokeStyle = "#333";
+  ctx.lineWidth = 2;
+  ctx.strokeRect(100, baseY - rabbet, 40, rabbet);
+  ctx.fillStyle = "#000";
+  ctx.fillText("Rabbet", 100, baseY - rabbet - 8);
 
-      ctx.strokeStyle = "#333";
-      ctx.lineWidth = 2;
-      ctx.strokeRect(100, baseY - rabbet, 40, rabbet);
-      ctx.fillStyle = "#000";
-      ctx.fillText("Rabbet", 100, baseY - rabbet - 8);
+  // Draw artwork
+  ctx.fillStyle = "#aaa";
+  ctx.fillRect(150, baseY - strainerHeight - artHeight, 40, artHeight);
+  ctx.fillStyle = "#000";
+  ctx.fillText("Artwork", 195, baseY - strainerHeight - artHeight / 2);
 
-      if (hasStrainer) {
-        ctx.fillStyle = "#888";
-        ctx.fillRect(140, baseY - strainerHeight, 40, strainerHeight);
-        ctx.fillStyle = "#000";
-        ctx.fillText("Strainer", 190, baseY - strainerHeight / 2);
-      }
+  // Draw strainer if present
+  if (hasStrainer) {
+    ctx.fillStyle = "#888";
+    ctx.fillRect(150, baseY - strainerHeight, 40, strainerHeight);
+    ctx.fillStyle = "#000";
+    ctx.fillText("Strainer", 195, baseY - strainerHeight / 2);
+  }
 
-      ctx.fillStyle = "#aaa";
-      ctx.fillRect(140, baseY - strainerHeight - artHeight, 40, artHeight);
-      ctx.fillStyle = "#000";
-      ctx.fillText("Artwork", 190, baseY - strainerHeight - artHeight / 2);
-    }
+  // ---- Inside Height Dimension (Rabbet Fit) ----
+  ctx.strokeStyle = "#444";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(85, baseY);
+  ctx.lineTo(85, baseY - rabbet);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(80, baseY);
+  ctx.lineTo(90, baseY);
+  ctx.moveTo(80, baseY - rabbet);
+  ctx.lineTo(90, baseY - rabbet);
+  ctx.stroke();
+  ctx.fillStyle = "#444";
+  ctx.font = "12px sans-serif";
+  ctx.fillText(`${rabbetDepth.toFixed(3)}" inside`, 10, baseY - rabbet / 2);
+
+  // ---- Outside Height Dimension (Profile Height) ----
+  ctx.strokeStyle = "#000";
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(250, baseY);
+  ctx.lineTo(250, baseY - profileHeight);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(245, baseY);
+  ctx.lineTo(255, baseY);
+  ctx.moveTo(245, baseY - profileHeight);
+  ctx.lineTo(255, baseY - profileHeight);
+  ctx.stroke();
+  ctx.fillStyle = "#000";
+  ctx.fillText(`${profileDepth.toFixed(3)}" profile`, 260, baseY - profileHeight / 2);
+}
   </script>
 
 </body>
