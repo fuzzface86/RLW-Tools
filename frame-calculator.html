@@ -177,27 +177,44 @@
       const outsideWidth = totalWidth + (2 * ProfileDepth);
       const outsideHeight = totalHeight + (2 * ProfileDepth);
 
-      const baseRates = { maple: 1.2, cherry: 1.0, walnut: 1.6 };
-      const perimeter = 2 * (sideA + sideB);
-      const unitCost = baseRates[wood] * perimeter;
+      const perimeter = 2 * (sideA + sideB); // inches
+      const thickness = 0.75; // inch (can be made adjustable if needed)
+      const customPrice = parseFloat(document.getElementById("customPrice").value);
+
+// Board feet per frame (4 sides): use face width and thickness
+      const boardFeetPerFrame = (thickness * faceWidth * perimeter) / 144;
+
+// Determine wood cost per board foot
+      const baseRates = { maple: 5.5, cherry: 4.0, walnut: 8.0 }; // example base prices
+      const boardFootRate = customPrice || baseRates[wood];
+
+      const woodCost = boardFeetPerFrame * boardFootRate * qty;
       const profileMultiplier = profile === "curved" ? 1.2 : 1.0;
-      const finalCost = (unitCost * profileMultiplier * qty).toFixed(2);
+      const finalCost = (woodCost * profileMultiplier).toFixed(2);
+
 
       document.getElementById("cutList").innerHTML = `
         <strong>Frame Side Cuts (per frame):</strong><br>
         - ${sideA.toFixed(2)}" x 2<br>
         - ${sideB.toFixed(2)}" x 2<br>
         <br><em>Mitered 45° corners. Add 2” total for join clearance.</em><br><br>
-        <strong>Outside Frame Dimensions:</strong><br>
-        - Width: ${outsideWidth.toFixed(2)}"<br>
-        - Height: ${outsideHeight.toFixed(2)}"
-      `;
+
+  <strong>Inside Frame Dimensions (Rabbet Fit):</strong><br>
+  - Width: ${totalWidth.toFixed(2)}"<br>
+  - Height: ${totalHeight.toFixed(2)}"<br><br>
+
+  <strong>Outside Frame Dimensions:</strong><br>
+  - Width: ${outsideWidth.toFixed(2)}"<br>
+  - Height: ${outsideHeight.toFixed(2)}"
+`;
+
 
       document.getElementById("priceEstimate").innerHTML = `
-        <strong>Estimate:</strong> $${finalCost} for ${qty} frame(s)<br>
-        - Wood: ${wood.charAt(0).toUpperCase() + wood.slice(1)}<br>
-        - Profile: ${profile}, Matting: ${matting ? "Yes" : "No"}
-      `;
+  <strong>Estimate:</strong> $${finalCost} for ${qty} frame(s)<br>
+  - Wood: ${wood.charAt(0).toUpperCase() + wood.slice(1)} @ $${boardFootRate.toFixed(2)}/bdft<br>
+  - Profile: ${profile}, Matting: ${matting ? "Yes" : "No"}<br>
+  - Board Feet Required: ${boardFeetPerFrame.toFixed(3)} bdft/frame
+`;
 
       const warningBox = document.getElementById("rabbetWarning");
       if (totalBackDepth > rabbetDepth) {
