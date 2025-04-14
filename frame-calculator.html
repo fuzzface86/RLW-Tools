@@ -47,7 +47,10 @@
   <label>Artwork Height (inches): <input type="number" id="artHeight" step="0.01"></label>
   <label>Artwork Thickness (inches): <input type="number" id="artworkThickness" step="0.01" value="0.75"></label>
   <label>Include 1/2" Strainer? <select id="strainer"><option value="no">No</option><option value="yes">Yes</option></select></label>
-  <label>Profile Type: <select id="profileType"><option value="straight">Straight</option><option value="curved">Curved</option></select></label>
+  <label>Include Matting? <select id="matting"><option value="no">No</option><option value="yes">Yes</option></select></label>
+  <label>Include Spacer? <select id="spacer"><option value="no">No</option><option value="yes">Yes</option></select></label>
+  <label>Include Plexiglass? <select id="plexi"><option value="no">No</option><option value="yes">Yes</option></select></label>
+
   <label>Face Width (inches): <input type="number" id="faceWidth" step="0.01" value="0.75"></label>
   <label>Wood Type:
     <select id="woodType">
@@ -57,11 +60,14 @@
     </select>
   </label>
   <label>Price per Board Foot: <input type="number" id="customPrice" step="0.01" placeholder="Optional override..."></label>
-  <label>Include Matting? <select id="matting"><option value="no">No</option><option value="yes">Yes</option></select></label>
-  <label>Include Spacer? <select id="spacer"><option value="no">No</option><option value="yes">Yes</option></select></label>
-  <label>Include Plexiglass? <select id="plexi"><option value="no">No</option><option value="yes">Yes</option></select></label>
-  <label>Profile Depth (inches): <input type="number" id="ProfileDepth" step="0.01" value="1.25"></label>
-  <label>Rabbet Depth (inches): <input type="number" id="rabbetDepth" step="0.01" value="0.375"></label>
+
+  <label>Calculated Rabbet Depth (inches):
+    <input type="number" id="rabbetDepth" step="0.001" readonly>
+  </label>
+  <label>Calculated Profile Depth (inches):
+    <input type="number" id="profileDepth" step="0.001" readonly>
+  </label>
+
   <label>Quantity: <input type="number" id="quantity" value="1" min="1"></label>
   <label>Client / Project Notes: <textarea id="notes" rows="4" placeholder="Optional notes or special instructions..."></textarea></label>
 
@@ -71,7 +77,6 @@
     <h3>Cut List & Estimate</h3>
     <div id="cutList"></div>
     <div id="priceEstimate"></div>
-    <div id="rabbetWarning" class="warning"></div>
     <div id="rabbetEstimate" style="margin-top: 1em; font-style: italic;"></div>
     <canvas id="diagramTop" width="600" height="400"></canvas>
     <canvas id="diagramSide" width="600" height="200"></canvas>
@@ -81,46 +86,52 @@
     function calculate() {
       const width = parseFloat(document.getElementById("artWidth").value);
       const height = parseFloat(document.getElementById("artHeight").value);
-      const artworkThickness = parseFloat(document.getElementById("artworkThickness").value) || 0.75;
-      const strainerIncluded = document.getElementById("strainer").value === "yes";
-      const strainerThickness = strainerIncluded ? 0.5 : 0;
-      const profile = document.getElementById("profileType").value;
-      const profileDepth = parseFloat(document.getElementById("ProfileDepth").value) || 1.25;
+      const artwork = parseFloat(document.getElementById("artworkThickness").value) || 0.75;
+      const hasStrainer = document.getElementById("strainer").value === "yes";
+      const hasMat = document.getElementById("matting").value === "yes";
+      const hasSpacer = document.getElementById("spacer").value === "yes";
+      const hasPlexi = document.getElementById("plexi").value === "yes";
       const faceWidth = parseFloat(document.getElementById("faceWidth").value) || 0.75;
-      const wood = document.getElementById("woodType").value;
-      const customPrice = parseFloat(document.getElementById("customPrice").value);
-      const matting = document.getElementById("matting").value === "yes";
-      const plexiIncluded = document.getElementById("plexi").value === "yes";
-      const plexiThickness = plexiIncluded ? 0.125 : 0;
       const qty = parseInt(document.getElementById("quantity").value);
-      const rabbetDepth = parseFloat(document.getElementById("rabbetDepth").value) || 0.375;
+      const customPrice = parseFloat(document.getElementById("customPrice").value);
+      const wood = document.getElementById("woodType").value;
+      const baseRates = { maple: 5.5, cherry: 4.0, walnut: 8.0 };
 
       if (!width || !height || qty < 1) {
         alert("Please enter valid artwork dimensions and quantity.");
         return;
       }
 
-      const matAllowance = matting ? 0.5 : 0.25;
-      const totalBackDepth = artworkThickness + strainerThickness;
+      // Automatic Rabbet and Profile Depth Calculation
+      let rabbet = artwork;
+      if (hasStrainer) rabbet += 0.5;
+      if (hasMat) rabbet += 0.25;
+      if (hasSpacer) rabbet += 0.125;
+      if (hasPlexi) rabbet += 0.125;
+      rabbet += 0.25; // for pins/hardware
+      rabbet = parseFloat(rabbet.toFixed(3));
+
+      let profile = parseFloat((rabbet + 0.25).toFixed(3));
+
+      document.getElementById("rabbetDepth").value = rabbet;
+      document.getElementById("profileDepth").value = profile;
+
+      // Mat allowance for inside fit
+      const matAllowance = hasMat ? 0.5 : 0.25;
       const totalWidth = width + matAllowance;
       const totalHeight = height + matAllowance;
 
-      const sideA = totalWidth + (2 * rabbetDepth);
-      const sideB = totalHeight + (2 * rabbetDepth);
+      const sideA = totalWidth + (2 * rabbet);
+      const sideB = totalHeight + (2 * rabbet);
+      const outsideWidth = totalWidth + (2 * profile);
+      const outsideHeight = totalHeight + (2 * profile);
 
-      const outsideWidth = totalWidth + (2 * profileDepth);
-      const outsideHeight = totalHeight + (2 * profileDepth);
-
-      const perimeter = 2 * (sideA + sideB); // inches
-      const thickness = 0.75; // fixed thickness
+      const perimeter = 2 * (sideA + sideB);
+      const thickness = 0.75;
       const boardFeetPerFrame = (thickness * faceWidth * perimeter) / 144;
-
-      const baseRates = { maple: 5.5, cherry: 4.0, walnut: 8.0 };
       const boardFootRate = customPrice || baseRates[wood];
-
-      const woodCost = boardFeetPerFrame * boardFootRate * qty;
-      const profileMultiplier = profile === "curved" ? 1.2 : 1.0;
-      const finalCost = (woodCost * profileMultiplier).toFixed(2);
+      const profileMultiplier = profile > 1.5 ? 1.2 : 1.0;
+      const finalCost = (boardFeetPerFrame * boardFootRate * profileMultiplier * qty).toFixed(2);
 
       document.getElementById("cutList").innerHTML = `
         <strong>Frame Side Cuts (per frame):</strong><br>
@@ -138,27 +149,18 @@
       document.getElementById("priceEstimate").innerHTML = `
         <strong>Estimate:</strong> $${finalCost} for ${qty} frame(s)<br>
         - Wood: ${wood.charAt(0).toUpperCase() + wood.slice(1)} @ $${boardFootRate.toFixed(2)}/bdft<br>
-        - Profile: ${profile}, Matting: ${matting ? "Yes" : "No"}<br>
-        - Board Feet Required: ${boardFeetPerFrame.toFixed(3)} bdft/frame
+        - Profile Depth: ${profile}"<br>
+        - Board Feet: ${boardFeetPerFrame.toFixed(3)} bdft/frame
       `;
 
-      const warningBox = document.getElementById("rabbetWarning");
-      if (totalBackDepth > rabbetDepth) {
-        warningBox.innerText = `⚠️ Warning: Total build depth (${totalBackDepth.toFixed(2)}") exceeds rabbet depth (${rabbetDepth}"). You may need a deeper profile or build out.`;
-      } else {
-        warningBox.innerText = '';
-      }
-
-      const matDepth = matting ? 0.125 : 0;
-      const estimatedRabbetHeight = artworkThickness + strainerThickness + matDepth + plexiThickness;
       document.getElementById("rabbetEstimate").innerHTML =
-        `Estimated rabbet height needed: <strong>${estimatedRabbetHeight.toFixed(3)}"</strong><br>` +
-        `(Artwork${strainerIncluded ? " + Strainer" : ""}${matting ? " + Matting" : ""}${plexiIncluded ? " + Plexiglass" : ""})<br>` +
-        `Standard rabbet depth: ${rabbetDepth.toFixed(3)}"`;
+        `Auto-calculated rabbet depth: <strong>${rabbet}"</strong><br>` +
+        `Includes: artwork${hasStrainer ? " + strainer" : ""}${hasMat ? " + mat" : ""}${hasSpacer ? " + spacer" : ""}${hasPlexi ? " + plexi" : ""} + 0.25" hardware<br>` +
+        `Auto-calculated profile depth: <strong>${profile}"</strong>`;
 
       document.getElementById("output").style.display = "block";
-      drawTopDiagram(outsideWidth, outsideHeight, width, height, matting);
-      drawSideDiagram(rabbetDepth, artworkThickness, strainerIncluded);
+      drawTopDiagram(outsideWidth, outsideHeight, width, height, hasMat);
+      drawSideDiagram(rabbet, artwork, hasStrainer);
     }
 
     function drawTopDiagram(outW, outH, artW, artH, matting) {
@@ -184,14 +186,6 @@
       ctx.strokeStyle = "#aaa";
       ctx.lineWidth = 1;
       ctx.strokeRect(innerX, innerY, artBoxW, artBoxH);
-
-      ctx.fillStyle = "#000";
-      ctx.fillText(`Side A: ${outW.toFixed(2)}"`, offsetX + (outW * scale) / 2 - 40, offsetY - 10);
-      ctx.save();
-      ctx.translate(offsetX - 30, offsetY + (outH * scale) / 2);
-      ctx.rotate(-Math.PI / 2);
-      ctx.fillText(`Side B: ${outH.toFixed(2)}"`, -30, 0);
-      ctx.restore();
     }
 
     function drawSideDiagram(rabbetDepth, artwork, hasStrainer) {
