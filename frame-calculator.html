@@ -173,13 +173,13 @@
       if (hasMat) rabbet += 0.25;
       if (hasSpacer) rabbet += 0.125;
       if (hasPlexi) rabbet += 0.125;
-      rabbet += 0.25; // Additional allowance for hardware
+      rabbet += 0.125; // Additional allowance for hardware
       rabbet = parseFloat(rabbet.toFixed(3)); // Round to 3 decimal places
 
       let profile = parseFloat((rabbet + 0.25).toFixed(3)); // Profile depth calculation
 
       // Matting allowance for inside fit
-      const matAllowance = hasMat ? 0.5 : 0.25;
+      const matAllowance = hasMat ? 0.5 : 0.125;
       const totalWidth = width + matAllowance;
       const totalHeight = height + matAllowance;
 
